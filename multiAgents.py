@@ -78,6 +78,7 @@ class ReflexAgent(Agent):
         #print("newScaredTimes: ", newScaredTimes)
         "*** YOUR CODE HERE ***"
         score = 0;
+        #chase scared ghosts, flee non-scared ghosts
         for ghostState in newGhostStates:
             scaredTime = ghostState.scaredTimer
             ghostPos = ghostState.getPosition()
@@ -89,7 +90,18 @@ class ReflexAgent(Agent):
                 score += 10.0/distToPacman
             else:
                 score -= 10.0/distToPacman
-        #TODO try to get to the nearest food
+        #also try to get food
+        foodList = newFood.asList()
+        for foodLoc in foodList:
+            distToPacman = abs(newPos[0] - foodLoc[0]) + abs(newPos[1] - foodLoc[1])
+            if 0 == distToPacman:
+                score += 888888888
+            #TODO why does uncommenting the next two lines make pacman just not move ever?
+            #else:
+                #score += 9.0/distToPacman
+
+        #print len(foodList)
+        #print score
         return score #successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
