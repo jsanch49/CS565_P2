@@ -136,6 +136,36 @@ class MinimaxAgent(MultiAgentSearchAgent):
       Your minimax agent (question 2)
     """
 
+    def helper(self, gameState, curDepth, curAgent):
+        nagents = gameState.getNumAgents()
+        if curAgent+1 >= nagents:
+            if curDepth+1 >= self.depth:
+                actions = gameState.getLegalActions(curAgent)
+                if len(actions) == 0:
+                    return (self.evaluationFunction(gameState), [self.evaluationFunction(gameState)])
+                states = [gameState.generateSuccessor(curAgent, action) for action in actions]
+                scores = [self.evaluationFunction(state) for state in states]
+                desiredScore = max(scores) if 0 == curAgent else min(scores)
+                return (desiredScore, scores)
+            #iterate over states/actions
+            actions = gameState.getLegalActions(curAgent)
+            if len(actions) == 0:
+                return (self.evaluationFunction(gameState), [self.evaluationFunction(gameState)])
+            states = [gameState.generateSuccessor(curAgent, action) for action in actions]
+            scores = [self.helper(state, curDepth+1, 0)[0] for state in states]
+            #index 0 is pacman; only true here if there are no ghosts
+            desiredScore = max(scores) if 0 == curAgent else min(scores)
+            return (desiredScore, scores)
+        #iterate over states/actions
+        actions = gameState.getLegalActions(curAgent)
+        if len(actions) == 0:
+            return (self.evaluationFunction(gameState), [self.evaluationFunction(gameState)])
+        states = [gameState.generateSuccessor(curAgent, action) for action in actions]
+        scores = [self.helper(state, curDepth, curAgent+1)[0] for state in states]
+        #index 0 is pacman, a max agent; other indices are min agents
+        desiredScore = max(scores) if 0 == curAgent else min(scores)
+        return (desiredScore, scores)
+    
     def getAction(self, gameState):
         """
           Returns the minimax action from the current gameState using self.depth
@@ -154,7 +184,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        bestScore, scores = self.helper(gameState, 0, 0)
+        bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+        chosenIndex = random.choice(bestIndices)
+        return gameState.getLegalActions(0)[chosenIndex]
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
