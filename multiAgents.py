@@ -67,8 +67,6 @@ class ReflexAgent(Agent):
         to create a masterful evaluation function.
         """
         # Useful information you can extract from a GameState (pacman.py)
-        curPos = currentGameState.getPacmanPosition()
-        curFood = currentGameState.getFood()
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
@@ -85,9 +83,9 @@ class ReflexAgent(Agent):
             ghostDir = ghostState.getDirection()
             distToPacman = abs(newPos[0] - ghostPos[0]) + abs(newPos[1] - ghostPos[1])
             if 0 == distToPacman:
-                score = -5000
+                score = -999999999
             elif distToPacman <= scaredTime:
-                score += 10/distToPacman
+                score += 10.0/distToPacman
             else:
                 score -= 10.0/distToPacman
         # seek food
