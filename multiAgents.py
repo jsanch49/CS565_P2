@@ -42,9 +42,13 @@ class ReflexAgent(Agent):
         legalMoves = gameState.getLegalActions()
 
         # Choose one of the best actions
+        print("====== getting next action =========")
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+
+        print(bestIndices)
+        print([legalMoves[i] for i in bestIndices])
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
         "Add more of your code here if you want to"
@@ -67,6 +71,9 @@ class ReflexAgent(Agent):
         to create a masterful evaluation function.
         """
         # Useful information you can extract from a GameState (pacman.py)
+        curPos = currentGameState.getPacmanPosition()
+        curFood = currentGameState.getFood()
+        #curFood[curPos[0]][curPos[1]] = False
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
@@ -77,18 +84,24 @@ class ReflexAgent(Agent):
         #print("newGhostStates: ", newGhostStates)
         #print("newScaredTimes: ", newScaredTimes)
         "*** YOUR CODE HERE ***"
-        score = 0;
+        score = 0
+        """
         for ghostState in newGhostStates:
             scaredTime = ghostState.scaredTimer
             ghostPos = ghostState.getPosition()
             ghostDir = ghostState.getDirection()
             distToPacman = abs(newPos[0] - ghostPos[0]) + abs(newPos[1] - ghostPos[1])
             if 0 == distToPacman:
-                score -= 999999999
+                score = -5000
             elif distToPacman <= scaredTime:
-                score += 10.0/distToPacman
+                score += 10/distToPacman
             else:
-                score -= 10.0/distToPacman
+                score -= 10/distToPacman
+        """
+        if curFood[newPos[0]][newPos[1]]:
+            score += 100
+            print("I am smart")
+            print(score)
         #TODO try to get to the nearest food
         return score #successorGameState.getScore()
 
