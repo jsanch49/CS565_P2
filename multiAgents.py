@@ -42,13 +42,9 @@ class ReflexAgent(Agent):
         legalMoves = gameState.getLegalActions()
 
         # Choose one of the best actions
-        print("====== getting next action =========")
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
-
-        print(bestIndices)
-        print([legalMoves[i] for i in bestIndices])
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
         "Add more of your code here if you want to"
@@ -73,19 +69,16 @@ class ReflexAgent(Agent):
         # Useful information you can extract from a GameState (pacman.py)
         curPos = currentGameState.getPacmanPosition()
         curFood = currentGameState.getFood()
-        #curFood[curPos[0]][curPos[1]] = False
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
-        #print("newPos: ", newPos)
-        #print("newFood: ", newFood)
-        #print("newGhostStates: ", newGhostStates)
-        #print("newScaredTimes: ", newScaredTimes)
         "*** YOUR CODE HERE ***"
-        score = 0
-        """
+        if successorGameState.getPacmanPosition() == currentGameState.getPacmanPosition():
+            return -999999999
+        score = 0;
+        #chase scared ghosts, flee non-scared ghosts
         for ghostState in newGhostStates:
             scaredTime = ghostState.scaredTimer
             ghostPos = ghostState.getPosition()
@@ -96,14 +89,19 @@ class ReflexAgent(Agent):
             elif distToPacman <= scaredTime:
                 score += 10/distToPacman
             else:
-                score -= 10/distToPacman
-        """
-        if curFood[newPos[0]][newPos[1]]:
-            score += 100
-            print("I am smart")
-            print(score)
-        #TODO try to get to the nearest food
-        return score #successorGameState.getScore()
+                score -= 10.0/distToPacman
+        # seek food
+        foodList = currentGameState.getFood().asList()
+        shortestDistToFood = len(newFood.data) + len(newFood.data[0])
+        for foodLoc in foodList:
+            foodDist = abs(newPos[1] - foodLoc[1]) + abs(newPos[0] - foodLoc[0])
+            if foodDist < shortestDistToFood:
+                shortestDistToFood = foodDist
+        if 1 > shortestDistToFood:
+            score += 888888888
+        else:
+            score += 9.0/shortestDistToFood
+        return score 
 
 def scoreEvaluationFunction(currentGameState):
     """
