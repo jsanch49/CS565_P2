@@ -42,6 +42,7 @@ class ReflexAgent(Agent):
         legalMoves = gameState.getLegalActions()
 
         # Choose one of the best actions
+        #print gameState.getPacmanPosition()
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
@@ -77,6 +78,8 @@ class ReflexAgent(Agent):
         #print("newGhostStates: ", newGhostStates)
         #print("newScaredTimes: ", newScaredTimes)
         "*** YOUR CODE HERE ***"
+        if successorGameState.getPacmanPosition() == currentGameState.getPacmanPosition():
+            return -999999999
         score = 0;
         #chase scared ghosts, flee non-scared ghosts
         for ghostState in newGhostStates:
@@ -91,17 +94,22 @@ class ReflexAgent(Agent):
             else:
                 score -= 10.0/distToPacman
         #also try to get food
-        foodList = newFood.asList()
+        foodList = currentGameState.getFood().asList()
+        #print foodList
+        shortestDistToFood = len(newFood.data) + len(newFood.data[0])
         for foodLoc in foodList:
-            distToPacman = abs(newPos[0] - foodLoc[0]) + abs(newPos[1] - foodLoc[1])
-            if 0 == distToPacman:
-                score += 888888888
-            #TODO why does uncommenting the next two lines make pacman just not move ever?
-            #else:
-                #score += 9.0/distToPacman
+            foodDist = abs(newPos[1] - foodLoc[1]) + abs(newPos[0] - foodLoc[0])
+            if foodDist < shortestDistToFood:
+                shortestDistToFood = foodDist
+        #print shortestDistToFood
+        if 1 > shortestDistToFood:
+            score += 888888888
+            #print "Food is here"
+        else:
+            score += 9.0/shortestDistToFood
 
         #print len(foodList)
-        #print score
+        #print(action, score)
         return score #successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
